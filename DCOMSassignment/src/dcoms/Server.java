@@ -15,16 +15,14 @@ public class Server extends UnicastRemoteObject implements Interface{
     
     //Methods
     @Override
-    
-    
     // GET ALL EMPLOYEE INFORMATION
     public List<String[]> getAllEmployees() throws RemoteException {
         List<String[]> employees = new ArrayList<>();
         String query = "SELECT * FROM tbl_Employees";
 
         try (Connection conn = DBconnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 String[] employee = new String[5];

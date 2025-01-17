@@ -7,9 +7,11 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public class Client {
-    public static void main(String[] args) throws RemoteException, NotBoundException, MalformedURLException
+    public static void main(String[] args) throws RemoteException, 
+                        NotBoundException, MalformedURLException
     {
-        Interface server = (Interface)Naming.lookup("rmi://localhost:1444/HRserver");
+        Interface server = (Interface)Naming.lookup("rmi://localhost:1444"
+                                                                + "/HRserver");
         
         List<String[]> employees = server.getAllEmployees();
         System.out.println("Employee Data:");
@@ -22,5 +24,4 @@ public class Client {
                                " - Leave Balance: " + employee[4] + "\n\n");
         }
     }
-    
 }
