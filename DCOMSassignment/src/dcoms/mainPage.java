@@ -112,11 +112,15 @@ public class mainPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAdminActionPerformed
-        // TODO add your handling code here:
+        loginPage login = new loginPage(server);
+        login.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_selectAdminActionPerformed
 
     private void selectEmpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectEmpActionPerformed
-        // TODO add your handling code here:
+        empLogin login = new empLogin (server);
+        login.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_selectEmpActionPerformed
 
 

@@ -1,6 +1,12 @@
 package dcoms;
 public class empUpdate extends javax.swing.JFrame {
-    public empUpdate() {
+    private Interface server;
+    private empPage page;
+    private String ID;
+    public empUpdate(Interface Server, empPage page, String ID) {
+        this.server = Server;
+        this.page = page;
+        this.ID = ID;
         initComponents();
     }
     @SuppressWarnings("unchecked")

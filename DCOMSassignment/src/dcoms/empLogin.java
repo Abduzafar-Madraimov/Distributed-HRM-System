@@ -1,6 +1,14 @@
 package dcoms;
+
+import dcoms.Serialization.EmployeeLogin;
+import dcoms.Serialization.EmployeeLoginDeserializer;
+import java.util.List;
+import javax.swing.JOptionPane;
+
 public class empLogin extends javax.swing.JFrame {
-    public empLogin() {
+    private Interface server;
+    public empLogin(Interface Server) {
+        this.server = Server;
         initComponents();
     }
     
@@ -14,7 +22,6 @@ public class empLogin extends javax.swing.JFrame {
         empLoginPassField = new javax.swing.JPasswordField();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        empLoginBack = new javax.swing.JButton();
         empLoginExit = new javax.swing.JButton();
         empLoginBtn = new javax.swing.JButton();
 
@@ -31,11 +38,6 @@ public class empLogin extends javax.swing.JFrame {
 
         empLoginPassField.setBackground(new java.awt.Color(255, 255, 255));
         empLoginPassField.setForeground(new java.awt.Color(0, 0, 0));
-        empLoginPassField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                empLoginPassFieldActionPerformed(evt);
-            }
-        });
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -45,13 +47,6 @@ public class empLogin extends javax.swing.JFrame {
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Employee Password:");
 
-        empLoginBack.setText("Back");
-        empLoginBack.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                empLoginBackActionPerformed(evt);
-            }
-        });
-
         empLoginExit.setText("Exit");
         empLoginExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -60,6 +55,11 @@ public class empLogin extends javax.swing.JFrame {
         });
 
         empLoginBtn.setText("Login");
+        empLoginBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                empLoginBtnActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -68,26 +68,21 @@ public class empLogin extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(232, 232, 232)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(183, 183, 183)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(232, 232, 232)
-                                .addComponent(jLabel1))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(183, 183, 183)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(empLoginPassField)
-                                    .addComponent(empICField, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(0, 112, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(empLoginPassField)
+                            .addComponent(empICField, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(empLoginExit)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(empLoginBack)))
-                .addContainerGap())
+                        .addComponent(empLoginExit)))
+                .addContainerGap(118, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(303, 303, 303)
                 .addComponent(empLoginBtn)
@@ -109,9 +104,7 @@ public class empLogin extends javax.swing.JFrame {
                 .addGap(39, 39, 39)
                 .addComponent(empLoginBtn)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(empLoginBack)
-                    .addComponent(empLoginExit))
+                .addComponent(empLoginExit)
                 .addContainerGap())
         );
 
@@ -129,21 +122,47 @@ public class empLogin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void empLoginPassFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLoginPassFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_empLoginPassFieldActionPerformed
+    private void Login() {
+        String enteredIC = empICField.getText().trim();
+        String enteredPassword = new String(empLoginPassField.getPassword()).trim();
 
-    private void empLoginBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLoginBackActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_empLoginBackActionPerformed
+        if (enteredIC.isEmpty() || enteredPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Employee IC and Password cannot be empty.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
+        // Load stored logins
+        String Path = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/employees_data.ser";
+        List<EmployeeLogin> logins = EmployeeLoginDeserializer.loadLogins(Path);
+
+        // Authenticate
+        boolean isAuthenticated = false;
+        for (EmployeeLogin login : logins) {
+            if (login.getEmployeeIC().equals(enteredIC) && login.getPassword().equals(enteredPassword)) {
+                isAuthenticated = true;
+                break;
+            }
+        }
+
+        if (isAuthenticated) {
+            empPage dash = new empPage(server, enteredIC);
+            dash.setVisible(true);
+            this.setVisible(false);
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid Employee IC or Password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void empLoginExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLoginExitActionPerformed
         System.exit(0);
     }//GEN-LAST:event_empLoginExitActionPerformed
 
+    private void empLoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLoginBtnActionPerformed
+        Login();
+    }//GEN-LAST:event_empLoginBtnActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField empICField;
-    private javax.swing.JButton empLoginBack;
     private javax.swing.JButton empLoginBtn;
     private javax.swing.JButton empLoginExit;
     private javax.swing.JPasswordField empLoginPassField;

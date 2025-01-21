@@ -1,6 +1,8 @@
 package dcoms;
 public class adminDash extends javax.swing.JFrame {
-    public adminDash() {
+    private Interface server;
+    public adminDash(Interface Server) {
+        this.server = Server;
         initComponents();
     }
 
@@ -118,15 +120,21 @@ public class adminDash extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void manageEmployeeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmployeeActionPerformed
-        // TODO add your handling code here:
+        manageEmployee manage = new manageEmployee(server, this);
+        manage.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_manageEmployeeActionPerformed
 
     private void manageEmpLeaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpLeaveActionPerformed
-        // TODO add your handling code here:
+        empLeave leave = new empLeave(server, this);
+        leave.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_manageEmpLeaveActionPerformed
 
     private void generateEmpReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateEmpReportActionPerformed
-        // TODO add your handling code here:
+        generateLeave leave = new generateLeave(server, this);
+        leave.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_generateEmpReportActionPerformed
 
     private void adminExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminExitActionPerformed

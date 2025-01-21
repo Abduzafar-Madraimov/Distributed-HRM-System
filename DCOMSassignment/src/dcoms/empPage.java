@@ -1,7 +1,25 @@
 package dcoms;
+
+import java.rmi.RemoteException;
+import javax.swing.JOptionPane;
+
 public class empPage extends javax.swing.JFrame {
-    public empPage() {
+    private Interface server;
+    private String IC;
+    private String LeaveBalance;
+    private String ID;
+    public empPage(Interface Server, String IC) {
+        this.server = Server;
+        this.IC = IC;
         initComponents();
+        
+         // Add window listener
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                loadEmployeeData();
+            }
+        });
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -14,7 +32,7 @@ public class empPage extends javax.swing.JFrame {
         empName = new javax.swing.JLabel();
         empUpdateBtn = new javax.swing.JButton();
         empApplyLeaveBtn = new javax.swing.JButton();
-        empBackBtn = new javax.swing.JButton();
+        empCheckStatus = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -86,10 +104,14 @@ public class empPage extends javax.swing.JFrame {
             }
         });
 
-        empBackBtn.setBackground(new java.awt.Color(255, 255, 255));
-        empBackBtn.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
-        empBackBtn.setForeground(new java.awt.Color(0, 102, 153));
-        empBackBtn.setText("Back");
+        empCheckStatus.setBackground(new java.awt.Color(255, 255, 255));
+        empCheckStatus.setForeground(new java.awt.Color(0, 0, 0));
+        empCheckStatus.setText("Check Leave Request Status");
+        empCheckStatus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                empCheckStatusActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -97,17 +119,12 @@ public class empPage extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(empPagePaneW, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(41, 41, 41)
-                        .addComponent(empBackBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(empApplyLeaveBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(empUpdateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(15, Short.MAX_VALUE))
+                    .addComponent(empUpdateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(empCheckStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(empApplyLeaveBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 465, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -117,9 +134,9 @@ public class empPage extends javax.swing.JFrame {
                 .addComponent(empUpdateBtn)
                 .addGap(54, 54, 54)
                 .addComponent(empApplyLeaveBtn)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 259, Short.MAX_VALUE)
-                .addComponent(empBackBtn)
-                .addContainerGap())
+                .addGap(65, 65, 65)
+                .addComponent(empCheckStatus)
+                .addContainerGap(200, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -136,22 +153,53 @@ public class empPage extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    private void loadEmployeeData() {
+    try {
+        // Call server to fetch employee data by IC
+        String[] employeeData = server.getEmployeeDetailsByIC(IC);
+
+        if (employeeData != null) {
+            // Map first name and last name to the label
+            empName.setText(employeeData[1] + " " + employeeData[2]); // First Name + Last Name
+            ID = employeeData[0]; // Store Employee ID for further use
+            LeaveBalance = employeeData[3]; // Store Leave Balance for further use
+        } else {
+            JOptionPane.showMessageDialog(this, "Employee data not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    } catch (RemoteException e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Failed to load employee data.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+}
+    
+    
     private void empApplyLeaveBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empApplyLeaveBtnActionPerformed
-        // TODO add your handling code here:
+        applyLeave apply = new applyLeave(server, this, LeaveBalance, ID);
+        apply.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_empApplyLeaveBtnActionPerformed
 
     private void empUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empUpdateBtnActionPerformed
-        // TODO add your handling code here:
+        empUpdate up = new empUpdate(server, this, ID);
+        up.setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_empUpdateBtnActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         System.exit(0); 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void empCheckStatusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empCheckStatusActionPerformed
+        checkLeaveStatus status = new checkLeaveStatus(server, this, LeaveBalance, IC);
+        status.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_empCheckStatusActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton empApplyLeaveBtn;
-    private javax.swing.JButton empBackBtn;
+    private javax.swing.JButton empCheckStatus;
     private javax.swing.JLabel empName;
     private javax.swing.JPanel empPagePaneW;
     private javax.swing.JButton empUpdateBtn;

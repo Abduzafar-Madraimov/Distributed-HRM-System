@@ -1,8 +1,25 @@
-
 package dcoms;
+
+import java.rmi.RemoteException;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 public class empLeave extends javax.swing.JFrame {
-    public empLeave() {
+    private Interface server;
+    private adminDash dashboard;
+    public empLeave(Interface Server, adminDash dash) {
+        this.server = Server;
+        this.dashboard = dash;
         initComponents();
+        
+        // Add window listener
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowOpened(java.awt.event.WindowEvent e) {
+                populateAllLeaveRequests();
+            }
+        });
     }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -46,6 +63,8 @@ public class empLeave extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Manage Employee Leave Request");
 
+        jTable1.setBackground(new java.awt.Color(255, 255, 255));
+        jTable1.setForeground(new java.awt.Color(0, 0, 0));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -54,22 +73,27 @@ public class empLeave extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Emp_ID#", "Emp_Fn", "Emp_Ln", "Leave_CommenceDate", "Leave_NumberOfDays", "Leave_Status", "Leave_CreationDate"
+                "Request ID", "First Name", "Last Name", "Commencement Date", "Number of Days", "Leave Status", "Leave Creation Date"
             }
         ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
+        jTextField2.setEditable(false);
         jTextField2.setBackground(new java.awt.Color(204, 204, 204));
         jTextField2.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField2.setEnabled(false);
 
+        jTextField3.setEditable(false);
         jTextField3.setBackground(new java.awt.Color(204, 204, 204));
         jTextField3.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField3.setEnabled(false);
 
+        jTextField4.setEditable(false);
         jTextField4.setBackground(new java.awt.Color(204, 204, 204));
         jTextField4.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField4.setEnabled(false);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -83,21 +107,21 @@ public class empLeave extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Last Name:");
 
+        jTextField5.setEditable(false);
         jTextField5.setBackground(new java.awt.Color(204, 204, 204));
         jTextField5.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField5.setEnabled(false);
 
+        jTextField6.setEditable(false);
         jTextField6.setBackground(new java.awt.Color(204, 204, 204));
         jTextField6.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField6.setEnabled(false);
 
+        jTextField7.setEditable(false);
         jTextField7.setBackground(new java.awt.Color(204, 204, 204));
         jTextField7.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField7.setEnabled(false);
 
+        jTextField8.setEditable(false);
         jTextField8.setBackground(new java.awt.Color(204, 204, 204));
         jTextField8.setForeground(new java.awt.Color(0, 0, 0));
-        jTextField8.setEnabled(false);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -149,6 +173,11 @@ public class empLeave extends javax.swing.JFrame {
         empLeaveReqBackBtn2.setFont(new java.awt.Font("Tahoma", 1, 13)); // NOI18N
         empLeaveReqBackBtn2.setForeground(new java.awt.Color(0, 102, 153));
         empLeaveReqBackBtn2.setText("Back");
+        empLeaveReqBackBtn2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                empLeaveReqBackBtn2ActionPerformed(evt);
+            }
+        });
 
         comboStatus.setBackground(new java.awt.Color(255, 153, 51));
         comboStatus.setForeground(new java.awt.Color(0, 0, 0));
@@ -183,7 +212,7 @@ public class empLeave extends javax.swing.JFrame {
                                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(empLeaveReqUpdateBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(empLeaveReqSearchBtn, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 179, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -208,13 +237,14 @@ public class empLeave extends javax.swing.JFrame {
                             .addComponent(jLabel8)
                             .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(211, 211, 211))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1096, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(371, 371, 371)
-                .addComponent(jLabel1)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(371, 371, 371)
+                        .addComponent(jLabel1))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(22, 22, 22)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1096, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
@@ -227,9 +257,9 @@ public class empLeave extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(94, 94, 94)
                 .addComponent(jLabel1)
-                .addGap(58, 58, 58)
+                .addGap(43, 43, 43)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(92, 92, 92)
+                .addGap(107, 107, 107)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -292,13 +322,112 @@ public class empLeave extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void populateAllLeaveRequests() {
+        try {
+            // Fetch all leave requests from the server
+            List<String[]> leaveRequests = server.getAllLeaveRequests();
+
+            // Get the table model
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+            // Clear existing rows
+            model.setRowCount(0);
+
+            // Add rows to the table
+            for (String[] request : leaveRequests) {
+                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6]});
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Failed to load leave requests.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void getLeaveRequestsByIC() {
+        String ic = jTextField10.getText().trim(); // Get IC from input field
+        if (ic.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter an I/C.", "Input Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Call server to fetch leave requests by IC
+            List<String[]> leaveRequests = server.getLeaveRequestsByIC(ic);
+
+            // Get the table model
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) jTable1.getModel();
+
+            // Clear existing rows
+            model.setRowCount(0);
+
+            // Add rows to the table
+            for (String[] request : leaveRequests) {
+                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6]});
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching leave requests.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void mapSelectedRowToFields() {
+        int selectedRow = jTable1.getSelectedRow(); // Get selected row index
+        if (selectedRow != -1) {
+            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
+
+            // Set text fields with data from the selected row
+            jTextField2.setText(model.getValueAt(selectedRow, 0).toString()); // Request ID
+            jTextField4.setText(model.getValueAt(selectedRow, 1).toString()); // First Name
+            jTextField3.setText(model.getValueAt(selectedRow, 2).toString()); // Last Name
+            jTextField5.setText(model.getValueAt(selectedRow, 4).toString()); // Commencement Date
+            jTextField6.setText(model.getValueAt(selectedRow, 3).toString()); // Number of Days
+            jTextField8.setText(model.getValueAt(selectedRow, 5).toString()); // Status
+            jTextField7.setText(model.getValueAt(selectedRow, 6).toString()); // Creation Date
+        }
+    }
+    
+    private void updateLeaveRequest() {
+        String requestID = jTextField2.getText().trim(); // Get Request ID from text field
+        String status = comboStatus.getSelectedItem().toString(); // Get selected status from combo box
+
+        if (requestID.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please select a leave request to update.", "Selection Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        try {
+            // Call server to update leave request status
+            boolean result = server.updateLeaveStatus(requestID, status);
+
+            if (result) {
+                JOptionPane.showMessageDialog(this, "Leave request updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                populateAllLeaveRequests(); // Refresh the table
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update leave request.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error updating leave request.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
     private void empLeaveReqSearchBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLeaveReqSearchBtnActionPerformed
-        // TODO add your handling code here:
+        getLeaveRequestsByIC();
     }//GEN-LAST:event_empLeaveReqSearchBtnActionPerformed
 
     private void empLeaveReqUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLeaveReqUpdateBtnActionPerformed
-        // TODO add your handling code here:
+        updateLeaveRequest();
+        populateAllLeaveRequests();
     }//GEN-LAST:event_empLeaveReqUpdateBtnActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        mapSelectedRowToFields();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void empLeaveReqBackBtn2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLeaveReqBackBtn2ActionPerformed
+        dashboard.setVisible(true);
+        this.setVisible(false);
+    }//GEN-LAST:event_empLeaveReqBackBtn2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

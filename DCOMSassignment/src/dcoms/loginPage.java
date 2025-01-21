@@ -1,6 +1,13 @@
 package dcoms;
+
+import javax.swing.JOptionPane;
+
 public class loginPage extends javax.swing.JFrame {
-    public loginPage() {
+    private Interface server;
+    private String adminUsername = "Admin@";
+    private String adminPassword = "Admin123@";
+    public loginPage(Interface Server) {
+        this.server = Server;
         initComponents();
     }
 
@@ -104,9 +111,37 @@ public class loginPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void adminLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_adminLoginActionPerformed
-       
+       // Fetch username and password from input fields
+        String enteredUsername = adminUsernameField.getText().trim();
+        String enteredPassword = new String(adminPasswordField.getPassword()).trim(); // Use getPassword() for JPasswordField
+
+        // Validate input fields
+        if (enteredUsername.isEmpty() || enteredPassword.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and Password cannot be empty.", "Validation Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Authenticate the admin
+        if (authenticateAdmin(enteredUsername, enteredPassword)) {
+            // Open admin dashboard
+            adminDash dash = new adminDash(server);
+            dash.setVisible(true);
+            this.setVisible(false);
+        } else {
+            // Show error message
+            JOptionPane.showMessageDialog(this, "Wrong Username or Password.", "Login Failed", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_adminLoginActionPerformed
 
+
+    // Helper method for authentication
+    private boolean authenticateAdmin(String username, String password) {
+        // Replace these hardcoded values with values fetched securely (e.g., from a database or a configuration file)
+        final String adminUsername = "Admin@";
+        final String adminPassword = "Admin123@";
+
+        return username.equals(adminUsername) && password.equals(adminPassword);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton adminLogin;

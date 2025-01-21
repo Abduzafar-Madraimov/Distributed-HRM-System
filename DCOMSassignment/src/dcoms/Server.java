@@ -87,20 +87,23 @@ public class Server extends UnicastRemoteObject implements Interface{
     
     // EDIT EMPLOYEE DATA
     @Override
-    public boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
+    public Boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
         String query = "UPDATE TBL_EMPLOYEES SET Emp_FirstName = ?, Emp_LastName = ?, Emp_IC = ?, Emp_LeaveBalance = ? WHERE Emp_ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            if(!checkIfICExists(ic)){
+                // Set the parameters for the UPDATE query
+                stmt.setString(1, firstName);
+                stmt.setString(2, lastName);
+                stmt.setString(3, ic);
+                stmt.setInt(4, leaveBalance);
+                stmt.setString(5, id);
 
-            // Set the parameters for the UPDATE query
-            stmt.setString(1, firstName);
-            stmt.setString(2, lastName);
-            stmt.setString(3, ic);
-            stmt.setInt(4, leaveBalance);
-            stmt.setString(5, id);
-
-            // Execute the query
-            int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0; // Return true if at least one row was updated
+                // Execute the query
+                int rowsUpdated = stmt.executeUpdate();
+                return rowsUpdated > 0; // Return true if at least one row was updated
+            }
+            System.out.println("IC Already Exists");
+            return null; // return null to differentiate between IC error or Server/DB Error
         } catch (Exception e) {
             e.printStackTrace();
             return false; // Return false if an error occurs
@@ -160,17 +163,17 @@ public class Server extends UnicastRemoteObject implements Interface{
        return leaveRequests;
    }
     
-    // GET SPECIFIC LEAVE LEAVE REQUESTS
     @Override
-    public String[] getLeaveRequestsByIC(String IC) throws RemoteException {
+    public List<String[]> getLeaveRequestsByIC(String IC) throws RemoteException {
         String query = "SELECT r.LeaveRequest_ID, e.Emp_FirstName, e.Emp_LastName, " +
                        "r.LeaveRequest_CommencementDate, r.LeaveRequestAmount, " +
                        "r.LeaveRequest_Status, r.LeaveRequest_CreationDate " +
                        "FROM tbl_LeaveRequests r " +
-                       "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID" +
+                       "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID " +
                        "WHERE e.Emp_IC = ?";
 
-        String[] request = null; // Initialize as null to handle no-result cases
+        List<String[]> requests = new ArrayList<>(); // Initialize the list to store multiple results
+
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             // Set the IC parameter for the query
             stmt.setString(1, IC);
@@ -179,22 +182,25 @@ public class Server extends UnicastRemoteObject implements Interface{
             ResultSet rs = stmt.executeQuery();
 
             // Process the result set
-            if (rs.next()) {
-                request = new String[7];
-                request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Employee ID as String
-                request[1] = rs.getString("Emp_FirstName");       // First Name
-                request[2] = rs.getString("Emp_LastName");        // Last Name
+            while (rs.next()) {
+                String[] request = new String[7];
+                request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Leave Request ID as String
+                request[1] = rs.getString("Emp_FirstName");                // First Name
+                request[2] = rs.getString("Emp_LastName");                 // Last Name
                 request[3] = rs.getString("LeaveRequest_CommencementDate"); // Leave Commencement Date
                 request[4] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Leave Amount as String
-                request[5] = rs.getString("LeaveRequest_Status"); // Leave Status
-                request[6] = rs.getString("LeaveRequest_CreationDate"); // Leave Creation Date
+                request[5] = rs.getString("LeaveRequest_Status");          // Leave Status
+                request[6] = rs.getString("LeaveRequest_CreationDate");    // Leave Creation Date
+
+                requests.add(request); // Add the current row to the list
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return request; // Return the array or null if no result
+        return requests; // Return the list (empty if no results)
     }
+
     
     // UPDATE LEAVE STATUS OF EMPLOYEE
     @Override

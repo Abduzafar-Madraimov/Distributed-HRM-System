@@ -1,7 +1,10 @@
 package dcoms;
 public class generateLeave extends javax.swing.JFrame {
-
-    public generateLeave() {
+    private Interface server;
+    private adminDash dashboard;
+    public generateLeave(Interface Server, adminDash dash) {
+        this.server = Server;
+        this.dashboard = dash;
         initComponents();
     }
 
