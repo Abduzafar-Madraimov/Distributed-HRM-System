@@ -1,7 +1,7 @@
-Wed Jan 15 02:43:27 SGT 2025 : Apache Derby Network Server - 10.11.1.2 - (1629631) started and ready to accept connections on port 1527
+Mon Jan 20 12:23:42 SGT 2025 : Apache Derby Network Server - 10.11.1.2 - (1629631) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Wed Jan 15 02:43:28 SGT 2025:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.2 - (1629631): instance a816c00e-0194-6620-b7ed-00003a131f2d 
+Mon Jan 20 12:23:42 SGT 2025:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.2 - (1629631): instance a816c00e-0194-81f3-bd0a-00003a131f2d 
 on database directory C:\Users\amazi\Desktop\Year 3\Distibuted Systems\Assignment\DCOMS with class loader sun.misc.Launcher$AppClassLoader@6f94fa3e 
 Loaded from file:/C:/Program%20Files/Java/jdk1.8.0_111/db/lib/derby.jar
 java.vendor=Oracle Corporation
@@ -13,8 +13,8 @@ os.version=10.0
 derby.system.home=C:\Users\amazi\Desktop\Year 3\Distibuted Systems\Assignment
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Wed Jan 15 03:08:21 SGT 2025: Shutting down Derby engine
+Mon Jan 20 12:24:10 SGT 2025: Shutting down Derby engine
 ----------------------------------------------------------------
-Wed Jan 15 03:08:21 SGT 2025:
-Shutting down instance a816c00e-0194-6620-b7ed-00003a131f2d on database directory C:\Users\amazi\Desktop\Year 3\Distibuted Systems\Assignment\DCOMS with class loader sun.misc.Launcher$AppClassLoader@6f94fa3e 
+Mon Jan 20 12:24:10 SGT 2025:
+Shutting down instance a816c00e-0194-81f3-bd0a-00003a131f2d on database directory C:\Users\amazi\Desktop\Year 3\Distibuted Systems\Assignment\DCOMS with class loader sun.misc.Launcher$AppClassLoader@6f94fa3e 
 ----------------------------------------------------------------

@@ -10,18 +10,10 @@ public class Client {
     public static void main(String[] args) throws RemoteException, 
                         NotBoundException, MalformedURLException
     {
-        Interface server = (Interface)Naming.lookup("rmi://localhost:1444"
-                                                                + "/HRserver");
+        Interface server = (Interface)Naming.lookup("rmi://localhost:1444/HRserver");
         
-        List<String[]> employees = server.getAllEmployees();
-        System.out.println("Employee Data:");
-        // Iterate and print each employee's details
-        for (String[] employee : employees) {
-            System.out.println("ID: " + employee[0] +
-                               " - First Name: " + employee[1] +
-                               " - Last Name: " + employee[2] +
-                               " - IC: " + employee[3] +
-                               " - Leave Balance: " + employee[4] + "\n\n");
-        }
+         // Show the main page
+        mainPage MainPage = new mainPage(server); // Pass the server instance
+        MainPage.setVisible(true);
     }
 }

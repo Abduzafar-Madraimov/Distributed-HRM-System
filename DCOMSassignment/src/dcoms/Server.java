@@ -9,8 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Server extends UnicastRemoteObject implements Interface{
+    Connection conn;
     public Server() throws RemoteException{
         super();
+        this.conn = DBconnection.getConnection();
     }
     
     //Methods
@@ -18,10 +20,9 @@ public class Server extends UnicastRemoteObject implements Interface{
     // GET ALL EMPLOYEE INFORMATION
     public List<String[]> getAllEmployees() throws RemoteException {
         List<String[]> employees = new ArrayList<>();
-        String query = "SELECT * FROM tbl_Employees";
+        String query = "SELECT * FROM TBL_EMPLOYEES";
 
-        try (Connection conn = DBconnection.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);
+        try (PreparedStatement stmt = conn.prepareStatement(query);
             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
@@ -38,5 +39,258 @@ public class Server extends UnicastRemoteObject implements Interface{
         }
 
         return employees;
+    }
+    
+    // CHECK IF IC EXISTS FOR VALIDATION
+    @Override
+    public boolean checkIfICExists(String IC) throws RemoteException {
+        String query = "SELECT COUNT(*) FROM tbl_Employees WHERE Emp_IC = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Set the IC parameter
+            stmt.setString(1, IC);
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0; // Return true if count > 0, meaning IC exists
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false; // Return false if an exception occurs or IC doesn't exist
+    }
+    
+    @Override
+    // ADD NEW EMPLOYEE
+    public Boolean addNewEmployee(String firstName, String lastName, String IC) throws RemoteException{
+        String query = "INSERT INTO TBL_EMPLOYEES(Emp_FirstName, Emp_LastName, Emp_IC, Emp_LeaveBalance) VALUES (?, ?, ?, ?)";
+        try(PreparedStatement stmt = conn.prepareStatement(query)){
+            if(!checkIfICExists(IC)){
+                stmt.setString(1, firstName); //add first name to value
+                stmt.setString(2, lastName); //add last name to value
+                stmt.setString(3, IC); // add IC to value 
+                stmt.setInt(4, 30); // hard coded 30 days of leave balance at every new employee creation
+
+                int insertedRows = stmt.executeUpdate();
+                return insertedRows > 0; // If 1 row is inserted, return true
+            }
+            System.out.println("IC Already Exists");
+            return null; // return null to differentiate between IC error or Server/DB Error
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    // EDIT EMPLOYEE DATA
+    @Override
+    public boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
+        String query = "UPDATE TBL_EMPLOYEES SET Emp_FirstName = ?, Emp_LastName = ?, Emp_IC = ?, Emp_LeaveBalance = ? WHERE Emp_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            // Set the parameters for the UPDATE query
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, ic);
+            stmt.setInt(4, leaveBalance);
+            stmt.setString(5, id);
+
+            // Execute the query
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // Return true if at least one row was updated
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+    
+    // DELETE AN EMPLOYEE
+    @Override
+    public boolean deleteEmployee(String id) throws RemoteException {
+        String query = "DELETE FROM tbl_Employees WHERE Emp_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the ID parameter for the DELETE query
+            stmt.setString(1, id);
+
+            // Execute the query
+            int rowsDeleted = stmt.executeUpdate();
+            return rowsDeleted > 0; // Return true if at least one row was deleted
+        } 
+        catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+    
+    // GET ALL LEAVE REQUESTS
+    @Override
+    public List<String[]> getAllLeaveRequests() throws RemoteException {
+        List<String[]> leaveRequests = new ArrayList<>();
+        String query = "SELECT r.LeaveRequest_ID, e.Emp_FirstName, e.Emp_LastName, " +
+                       "r.LeaveRequest_CommencementDate, r.LeaveRequestAmount, " +
+                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate " +
+                       "FROM tbl_LeaveRequests r " +
+                       "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
+
+               // Iterate through the result set and populate the list
+               while (rs.next()) {
+                   String[] request = new String[7];
+                   request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Leave Request ID
+                   request[1] = rs.getString("Emp_FirstName");       // First Name
+                   request[2] = rs.getString("Emp_LastName");        // Last Name
+                   request[3] = rs.getString("LeaveRequest_CommencementDate"); // Leave Commencement Date
+                   request[4] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Leave Amount
+                   request[5] = rs.getString("LeaveRequest_Status"); // Leave Status
+                   request[6] = rs.getString("LeaveRequest_CreationDate"); // Leave Creation Date
+
+                   leaveRequests.add(request);
+               }
+           } 
+           catch (Exception e) {
+               e.printStackTrace();
+               System.out.println("Error in getting all leave requests");
+           }
+
+       return leaveRequests;
+   }
+    
+    // GET SPECIFIC LEAVE LEAVE REQUESTS
+    @Override
+    public String[] getLeaveRequestsByIC(String IC) throws RemoteException {
+        String query = "SELECT r.LeaveRequest_ID, e.Emp_FirstName, e.Emp_LastName, " +
+                       "r.LeaveRequest_CommencementDate, r.LeaveRequestAmount, " +
+                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate " +
+                       "FROM tbl_LeaveRequests r " +
+                       "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID" +
+                       "WHERE e.Emp_IC = ?";
+
+        String[] request = null; // Initialize as null to handle no-result cases
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the IC parameter for the query
+            stmt.setString(1, IC);
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+
+            // Process the result set
+            if (rs.next()) {
+                request = new String[7];
+                request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Employee ID as String
+                request[1] = rs.getString("Emp_FirstName");       // First Name
+                request[2] = rs.getString("Emp_LastName");        // Last Name
+                request[3] = rs.getString("LeaveRequest_CommencementDate"); // Leave Commencement Date
+                request[4] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Leave Amount as String
+                request[5] = rs.getString("LeaveRequest_Status"); // Leave Status
+                request[6] = rs.getString("LeaveRequest_CreationDate"); // Leave Creation Date
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return request; // Return the array or null if no result
+    }
+    
+    // UPDATE LEAVE STATUS OF EMPLOYEE
+    @Override
+    public boolean updateLeaveStatus(String leaveRequestId, String newStatus) throws RemoteException {
+        String query = "UPDATE tbl_LeaveRequests SET LeaveRequest_Status = ? WHERE LeaveRequest_ID = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the parameters for the query
+            stmt.setString(1, newStatus);                  // New leave status
+            stmt.setString(2, leaveRequestId); // Convert leaveRequestId to int
+
+            // Execute the update
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // Return true if at least one row was updated
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+    
+    // GET EMPLOYEE DETAILS
+    @Override
+    public String[] getEmployeeDetailsByIC(String ic) throws RemoteException{
+        String query = "SELECT Emp_ID, Emp_FirstName, Emp_LastName, Emp_LeaveBalance FROM tbl_Employees WHERE Emp_IC = ?";
+        String[] employeeDetails = null;
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the IC parameter
+            stmt.setString(1, ic);
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+
+            // If a matching employee is found, populate the array
+            if (rs.next()) {
+                employeeDetails = new String[4];
+                employeeDetails[0] = String.valueOf(rs.getInt("Emp_ID")); // Employee ID (as String)
+                employeeDetails[1] = rs.getString("Emp_FirstName"); // First Name
+                employeeDetails[2] = rs.getString("Emp_LastName");  // Last Name
+                employeeDetails[3] = String.valueOf(rs.getInt("Emp_LeaveBalance")); // Leave Balance (as String)
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return employeeDetails; // Return null if no employee is found
+    }
+    
+    // APPLY FOR LEAVE REQUEST
+    @Override
+    public boolean applyLeaveRequest(String empId, String commencementDate, String amountOfDays) throws RemoteException {
+        String query = "INSERT INTO tbl_LeaveRequests (Emp_ID, LeaveRequest_CommencementDate, LeaveRequestAmount, LeaveRequest_Status, LeaveRequest_CreationDate) " +
+                       "VALUES (?, ?, ?, 'Pending', CURRENT_DATE)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the parameters for the query
+            stmt.setInt(1, Integer.parseInt(empId)); // Employee ID as integer
+            stmt.setString(2, commencementDate);    // Commencement Date as string
+            stmt.setInt(3, Integer.parseInt(amountOfDays)); // Amount of Days as integer
+
+            // Execute the query
+            int rowsInserted = stmt.executeUpdate();
+            return rowsInserted > 0; // Return true if the insertion is successful
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an error occurs
+        }
+    }
+    
+    // VIEW EMPLOYEE REQUEST STATUS (AND HISTORY)
+    @Override
+    public List<String[]> viewRequestStatusByEmpId(String empId) throws RemoteException {
+        String query = "SELECT LeaveRequest_CreationDate, LeaveRequestAmount, LeaveRequest_CommencementDate, LeaveRequest_Status " +
+                       "FROM tbl_LeaveRequests WHERE Emp_ID = ?";
+        List<String[]> leaveRequests = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            // Set the Employee ID parameter
+            stmt.setInt(1, Integer.parseInt(empId));
+
+            // Execute the query
+            ResultSet rs = stmt.executeQuery();
+
+            // Process the result set
+            while (rs.next()) {
+                String[] request = new String[4];
+                request[0] = rs.getString("LeaveRequest_CreationDate");       // Creation Date
+                request[1] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Amount of Days
+                request[2] = rs.getString("LeaveRequest_CommencementDate");  // Commencement Date
+                request[3] = rs.getString("LeaveRequest_Status");            // Status
+
+                leaveRequests.add(request);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return leaveRequests; // Return the list of leave requests
     }
 }
