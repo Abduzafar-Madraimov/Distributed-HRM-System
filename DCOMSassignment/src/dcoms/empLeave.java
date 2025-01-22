@@ -8,6 +8,7 @@ import javax.swing.table.DefaultTableModel;
 public class empLeave extends javax.swing.JFrame {
     private Interface server;
     private adminDash dashboard;
+    private String ID;
     public empLeave(Interface Server, adminDash dash) {
         this.server = Server;
         this.dashboard = dash;
@@ -67,13 +68,13 @@ public class empLeave extends javax.swing.JFrame {
         jTable1.setForeground(new java.awt.Color(0, 0, 0));
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Request ID", "First Name", "Last Name", "Commencement Date", "Number of Days", "Leave Status", "Leave Creation Date"
+                "Request ID", "First Name", "Last Name", "Commencement Date", "Number of Days", "Leave Status", "Leave Creation Date", "ID"
             }
         ));
         jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -335,7 +336,7 @@ public class empLeave extends javax.swing.JFrame {
 
             // Add rows to the table
             for (String[] request : leaveRequests) {
-                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6]});
+                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6], request[7]});
             }
         } catch (RemoteException e) {
             e.printStackTrace();
@@ -362,7 +363,7 @@ public class empLeave extends javax.swing.JFrame {
 
             // Add rows to the table
             for (String[] request : leaveRequests) {
-                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6]});
+                model.addRow(new Object[]{request[0], request[1], request[2], request[3], request[4], request[5], request[6], request[7]});
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -383,13 +384,14 @@ public class empLeave extends javax.swing.JFrame {
             jTextField6.setText(model.getValueAt(selectedRow, 3).toString()); // Number of Days
             jTextField8.setText(model.getValueAt(selectedRow, 5).toString()); // Status
             jTextField7.setText(model.getValueAt(selectedRow, 6).toString()); // Creation Date
+            ID = model.getValueAt(selectedRow, 7).toString();
         }
     }
     
     private void updateLeaveRequest() {
         String requestID = jTextField2.getText().trim(); // Get Request ID from text field
         String status = comboStatus.getSelectedItem().toString(); // Get selected status from combo box
-
+        String amt = jTextField5.getText().trim();
         if (requestID.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please select a leave request to update.", "Selection Error", JOptionPane.WARNING_MESSAGE);
             return;
@@ -397,7 +399,7 @@ public class empLeave extends javax.swing.JFrame {
 
         try {
             // Call server to update leave request status
-            boolean result = server.updateLeaveStatus(requestID, status);
+            boolean result = server.updateLeaveStatus(requestID, status, ID, amt);
 
             if (result) {
                 JOptionPane.showMessageDialog(this, "Leave request updated successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);

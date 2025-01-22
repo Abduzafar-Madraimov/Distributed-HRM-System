@@ -179,7 +179,7 @@ public class applyLeave extends javax.swing.JFrame {
         // Regex for yyyy-mm-dd format
         String dateRegex = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$";
         if (!Pattern.matches(dateRegex, dateInput)) {
-            JOptionPane.showMessageDialog(null, "Date must be in this format yyyy-MM-dd");
+            JOptionPane.showMessageDialog(this, "Invalid date format. Please use yyyy-MM-dd.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return false; // Invalid format
         }
 
@@ -193,13 +193,13 @@ public class applyLeave extends javax.swing.JFrame {
             
             // Validate the year is not less than the current year
             if (inputDate.getYear() < currentDate.getYear()) {
-                JOptionPane.showMessageDialog(null, "Enter Valid Year");
+                JOptionPane.showMessageDialog(this, "Enter Valid Year", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
 
             // Validate the month and day
             if (inputDate.isBefore(currentDate) && inputDate.getYear() == currentDate.getYear()) {
-                JOptionPane.showMessageDialog(null, "Enter Valid Month or Day");
+                JOptionPane.showMessageDialog(this, "Enter Valid Month or Day", "Validation Error", JOptionPane.ERROR_MESSAGE);
                 return false; // The date is in the past within the current year
             }
             
@@ -209,7 +209,7 @@ public class applyLeave extends javax.swing.JFrame {
         }
     }
     
-    private boolean isValidDays(){
+    private boolean isValidAMT(){
         int LeaveBalance1 = Integer.parseInt(LeaveBalance);
         int Days  = Integer.parseInt(AMTdays.getText());
         return Days <= LeaveBalance1;
@@ -228,12 +228,11 @@ public class applyLeave extends javax.swing.JFrame {
     private void empLeaveApplyBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empLeaveApplyBtnActionPerformed
         // Validate the date format
         if (!isValidDate(DateField.getText())) {
-            JOptionPane.showMessageDialog(this, "Invalid date format. Please use yyyy-MM-dd.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Validate leave balance
-        if (!isValidDays()) {
+        if (!isValidAMT()) {
             JOptionPane.showMessageDialog(this, "Not enough leave balance.", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

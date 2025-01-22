@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 public class EmployeeLoginSerializer {
-    public static boolean saveLogin(EmployeeLogin login, String filePath) {
+    private static final String filePath = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/employees_data.ser";
+    public static boolean saveLogin(EmployeeLogin login) {
         File file = new File(filePath);
         boolean append = file.exists() && file.length() > 0; // Check if file exists and has data
 

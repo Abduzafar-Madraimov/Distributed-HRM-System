@@ -89,21 +89,17 @@ public class Server extends UnicastRemoteObject implements Interface{
     @Override
     public Boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
         String query = "UPDATE TBL_EMPLOYEES SET Emp_FirstName = ?, Emp_LastName = ?, Emp_IC = ?, Emp_LeaveBalance = ? WHERE Emp_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
-            if(!checkIfICExists(ic)){
-                // Set the parameters for the UPDATE query
-                stmt.setString(1, firstName);
-                stmt.setString(2, lastName);
-                stmt.setString(3, ic);
-                stmt.setInt(4, leaveBalance);
-                stmt.setString(5, id);
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {   
+            // Set the parameters for the UPDATE query
+            stmt.setString(1, firstName);
+            stmt.setString(2, lastName);
+            stmt.setString(3, ic);
+            stmt.setInt(4, leaveBalance);
+            stmt.setString(5, id);
 
-                // Execute the query
-                int rowsUpdated = stmt.executeUpdate();
-                return rowsUpdated > 0; // Return true if at least one row was updated
-            }
-            System.out.println("IC Already Exists");
-            return null; // return null to differentiate between IC error or Server/DB Error
+            // Execute the query
+            int rowsUpdated = stmt.executeUpdate();
+            return rowsUpdated > 0; // Return true if at least one row was updated
         } catch (Exception e) {
             e.printStackTrace();
             return false; // Return false if an error occurs
@@ -134,7 +130,7 @@ public class Server extends UnicastRemoteObject implements Interface{
         List<String[]> leaveRequests = new ArrayList<>();
         String query = "SELECT r.LeaveRequest_ID, e.Emp_FirstName, e.Emp_LastName, " +
                        "r.LeaveRequest_CommencementDate, r.LeaveRequestAmount, " +
-                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate " +
+                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate, e.Emp_ID " +
                        "FROM tbl_LeaveRequests r " +
                        "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID";
 
@@ -143,7 +139,7 @@ public class Server extends UnicastRemoteObject implements Interface{
 
                // Iterate through the result set and populate the list
                while (rs.next()) {
-                   String[] request = new String[7];
+                   String[] request = new String[8];
                    request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Leave Request ID
                    request[1] = rs.getString("Emp_FirstName");       // First Name
                    request[2] = rs.getString("Emp_LastName");        // Last Name
@@ -151,6 +147,7 @@ public class Server extends UnicastRemoteObject implements Interface{
                    request[4] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Leave Amount
                    request[5] = rs.getString("LeaveRequest_Status"); // Leave Status
                    request[6] = rs.getString("LeaveRequest_CreationDate"); // Leave Creation Date
+                   request[7] = rs.getString("Emp_ID");    // EmpID
 
                    leaveRequests.add(request);
                }
@@ -167,7 +164,7 @@ public class Server extends UnicastRemoteObject implements Interface{
     public List<String[]> getLeaveRequestsByIC(String IC) throws RemoteException {
         String query = "SELECT r.LeaveRequest_ID, e.Emp_FirstName, e.Emp_LastName, " +
                        "r.LeaveRequest_CommencementDate, r.LeaveRequestAmount, " +
-                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate " +
+                       "r.LeaveRequest_Status, r.LeaveRequest_CreationDate, e.Emp_ID " +
                        "FROM tbl_LeaveRequests r " +
                        "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID " +
                        "WHERE e.Emp_IC = ?";
@@ -183,7 +180,7 @@ public class Server extends UnicastRemoteObject implements Interface{
 
             // Process the result set
             while (rs.next()) {
-                String[] request = new String[7];
+                String[] request = new String[8];
                 request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Leave Request ID as String
                 request[1] = rs.getString("Emp_FirstName");                // First Name
                 request[2] = rs.getString("Emp_LastName");                 // Last Name
@@ -191,6 +188,7 @@ public class Server extends UnicastRemoteObject implements Interface{
                 request[4] = String.valueOf(rs.getInt("LeaveRequestAmount")); // Leave Amount as String
                 request[5] = rs.getString("LeaveRequest_Status");          // Leave Status
                 request[6] = rs.getString("LeaveRequest_CreationDate");    // Leave Creation Date
+                request[7] = rs.getString("Emp_ID");    // EmpID
 
                 requests.add(request); // Add the current row to the list
             }
@@ -204,19 +202,44 @@ public class Server extends UnicastRemoteObject implements Interface{
     
     // UPDATE LEAVE STATUS OF EMPLOYEE
     @Override
-    public boolean updateLeaveStatus(String leaveRequestId, String newStatus) throws RemoteException {
+    public boolean updateLeaveStatus(String leaveRequestId, String newStatus, String empID, String AMT) throws RemoteException {
         String query = "UPDATE tbl_LeaveRequests SET LeaveRequest_Status = ? WHERE LeaveRequest_ID = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             // Set the parameters for the query
             stmt.setString(1, newStatus);                  // New leave status
             stmt.setString(2, leaveRequestId); // Convert leaveRequestId to int
-
+             if(newStatus.equals("Approved")){
+                if(updateLeaveBalance(empID, AMT)){
+                    // Execute the update
+                    int rowsUpdated = stmt.executeUpdate();
+                    return rowsUpdated > 0; // Return true if at least one row was updated
+                }
+                return false;
+             }
             // Execute the update
             int rowsUpdated = stmt.executeUpdate();
             return rowsUpdated > 0; // Return true if at least one row was updated
         } catch (Exception e) {
             e.printStackTrace();
             return false; // Return false if an error occurs
+        }
+    }
+    
+    @Override
+    public boolean updateLeaveBalance(String empID, String AMT) throws RemoteException {
+        String query = "UPDATE tbl_Employees " +
+                       "SET Emp_LeaveBalance = Emp_LeaveBalance - ? " +
+                       "WHERE Emp_ID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, Integer.parseInt(AMT)); // Set the amount to subtract
+            stmt.setString(2, empID); // Set the employee ID
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Return true if at least one row is updated
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false; // Return false if an exception occurs
         }
     }
     

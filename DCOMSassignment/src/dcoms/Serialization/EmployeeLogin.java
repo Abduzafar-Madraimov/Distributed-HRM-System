@@ -21,4 +21,16 @@ public class EmployeeLogin implements Serializable {
     public String getPassword() {
         return password;
     }
+    
+    // Setter for updating the password
+    public void setPassword(String password) {
+        this.password = password;
+    }
+    
+    // Setter for updating the IC
+    public void setIC(String IC) {
+        this.employeeIC = IC;
+    }
+
+
 }
