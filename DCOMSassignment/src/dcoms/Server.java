@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,7 +200,33 @@ public class Server extends UnicastRemoteObject implements Interface{
         return requests; // Return the list (empty if no results)
     }
 
-    
+    // GET EMPLOYEE STATUS HISTORY
+    public List<String[]> getApprovedOrDeniedLeaveRequests(String ID) {
+        String query = "SELECT LeaveRequest_ID, LeaveRequest_CommencementDate, " +
+                       "LeaveRequest_Status, LeaveRequest_CreationDate, LeaveRequestAmount " +
+                       "FROM tbl_LeaveRequests WHERE LeaveRequest_Status IN ('Approved', 'Denied') AND Emp_ID = ?";
+
+        List<String[]> leaveRequests = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, ID);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String[] request = new String[6];
+                request[0] = String.valueOf(rs.getInt("LeaveRequest_ID")); // Request ID
+                request[1] = rs.getString("LeaveRequest_CommencementDate"); // Commencement Date
+                request[2] = rs.getString("LeaveRequest_Status"); // Status
+                request[3] = rs.getString("LeaveRequest_CreationDate"); // Creation Date
+                request[4] = rs.getString("LeaveRequestAmount"); // Creation Date
+
+                leaveRequests.add(request);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return leaveRequests;
+    }
+
     // UPDATE LEAVE STATUS OF EMPLOYEE
     @Override
     public boolean updateLeaveStatus(String leaveRequestId, String newStatus, String empID, String AMT) throws RemoteException {

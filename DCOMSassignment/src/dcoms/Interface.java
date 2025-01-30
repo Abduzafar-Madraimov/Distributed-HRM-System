@@ -12,6 +12,7 @@ public interface Interface extends Remote{ // we extend remote to use this metho
     public boolean deleteEmployee(String id) throws RemoteException; // EDIT AN EMPLOYEE
     public List<String[]> getAllLeaveRequests() throws RemoteException; // GET LEAVE REQUESTS OF EMPLOYEES
     public List<String[]> getLeaveRequestsByIC(String IC) throws RemoteException; // GET LEAVE REQUESTS OF SPECIFIC EMPLOYEE
+    public List<String[]> getApprovedOrDeniedLeaveRequests(String ID) throws RemoteException; // GET LEAVE REQUESTS OF SPECIFIC EMPLOYEE ID
     public boolean updateLeaveStatus(String leaveRequestId, String newStatus, String empID, String AMT) throws RemoteException; // UPDATE LEAVE STATUS
     public boolean updateLeaveBalance(String empID, String AMT) throws RemoteException; // UPDATE LEAVE BALANCE AFTER APPROVAL
     public String[] getEmployeeDetailsByIC(String ic) throws RemoteException; // GET EMPLOYEE DETAILS
