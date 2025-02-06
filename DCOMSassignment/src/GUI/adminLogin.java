@@ -3,11 +3,12 @@ package GUI;
 import dcoms.Interface;
 import javax.swing.JOptionPane;
 
-public class loginPage extends javax.swing.JFrame {
+public class adminLogin extends javax.swing.JFrame {
     private Interface server;
-    private String adminUsername = "Admin@";
-    private String adminPassword = "Admin123@";
-    public loginPage(Interface Server) {
+    
+    private final String adminUsername = "Admin@";
+    private final String adminPassword = "Admin123@";
+    public adminLogin(Interface Server) {
         this.server = Server;
         initComponents();
     }
@@ -134,13 +135,7 @@ public class loginPage extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_adminLoginActionPerformed
 
-
-    // Helper method for authentication
     private boolean authenticateAdmin(String username, String password) {
-        // Replace these hardcoded values with values fetched securely (e.g., from a database or a configuration file)
-        final String adminUsername = "Admin@";
-        final String adminPassword = "Admin123@";
-
         return username.equals(adminUsername) && password.equals(adminPassword);
     }
 

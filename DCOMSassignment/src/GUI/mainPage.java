@@ -114,7 +114,7 @@ public class mainPage extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void selectAdminActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAdminActionPerformed
-        loginPage login = new loginPage(server);
+        adminLogin login = new adminLogin(server);
         login.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_selectAdminActionPerformed

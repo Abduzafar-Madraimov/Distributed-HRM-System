@@ -6,11 +6,11 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
-public class empLeave extends javax.swing.JFrame {
+public class manageEmpLeave extends javax.swing.JFrame {
     private Interface server;
     private adminDash dashboard;
     private String ID;
-    public empLeave(Interface Server, adminDash dash) {
+    public manageEmpLeave(Interface Server, adminDash dash) {
         this.server = Server;
         this.dashboard = dash;
         initComponents();

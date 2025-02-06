@@ -128,7 +128,7 @@ public class adminDash extends javax.swing.JFrame {
     }//GEN-LAST:event_manageEmployeeActionPerformed
 
     private void manageEmpLeaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpLeaveActionPerformed
-        empLeave leave = new empLeave(server, this);
+        manageEmpLeave leave = new manageEmpLeave(server, this);
         leave.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_manageEmpLeaveActionPerformed
