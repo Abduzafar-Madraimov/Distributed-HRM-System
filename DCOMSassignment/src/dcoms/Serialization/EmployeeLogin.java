@@ -8,9 +8,8 @@ public class EmployeeLogin implements Serializable {
     private String employeeIC;
     private String password;
 
-    public EmployeeLogin(String employeeIC, String password) {
-        this.employeeIC = employeeIC;
-        this.password = password;
+    public EmployeeLogin() {
+        
     }
 
     // Getters

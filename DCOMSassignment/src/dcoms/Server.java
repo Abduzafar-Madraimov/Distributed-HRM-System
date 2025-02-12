@@ -5,15 +5,12 @@ import java.rmi.server.UnicastRemoteObject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Server extends UnicastRemoteObject implements Interface{
-    Connection conn;
     public Server() throws RemoteException{
         super();
-        this.conn = DBconnection.getConnection();
     }
     
     //Methods
@@ -23,7 +20,8 @@ public class Server extends UnicastRemoteObject implements Interface{
         List<String[]> employees = new ArrayList<>();
         String query = "SELECT * FROM TBL_EMPLOYEES";
 
-        try (PreparedStatement stmt = conn.prepareStatement(query);
+        try (Connection conn = DBconnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
@@ -46,7 +44,8 @@ public class Server extends UnicastRemoteObject implements Interface{
     @Override
     public boolean checkIfICExists(String IC) throws RemoteException {
         String query = "SELECT COUNT(*) FROM tbl_Employees WHERE Emp_IC = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
 
             // Set the IC parameter
             stmt.setString(1, IC);
@@ -67,7 +66,8 @@ public class Server extends UnicastRemoteObject implements Interface{
     // ADD NEW EMPLOYEE
     public Boolean addNewEmployee(String firstName, String lastName, String IC) throws RemoteException{
         String query = "INSERT INTO TBL_EMPLOYEES(Emp_FirstName, Emp_LastName, Emp_IC, Emp_LeaveBalance) VALUES (?, ?, ?, ?)";
-        try(PreparedStatement stmt = conn.prepareStatement(query)){
+        try(Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);){
             if(!checkIfICExists(IC)){
                 stmt.setString(1, firstName); //add first name to value
                 stmt.setString(2, lastName); //add last name to value
@@ -90,7 +90,8 @@ public class Server extends UnicastRemoteObject implements Interface{
     @Override
     public Boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
         String query = "UPDATE TBL_EMPLOYEES SET Emp_FirstName = ?, Emp_LastName = ?, Emp_IC = ?, Emp_LeaveBalance = ? WHERE Emp_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {   
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {   
             // Set the parameters for the UPDATE query
             stmt.setString(1, firstName);
             stmt.setString(2, lastName);
@@ -111,7 +112,8 @@ public class Server extends UnicastRemoteObject implements Interface{
     @Override
     public boolean deleteEmployee(String id) throws RemoteException {
         String query = "DELETE FROM tbl_Employees WHERE Emp_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the ID parameter for the DELETE query
             stmt.setString(1, id);
 
@@ -135,7 +137,8 @@ public class Server extends UnicastRemoteObject implements Interface{
                        "FROM tbl_LeaveRequests r " +
                        "JOIN tbl_Employees e ON r.Emp_ID = e.Emp_ID";
 
-        try (PreparedStatement stmt = conn.prepareStatement(query);
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);
                 ResultSet rs = stmt.executeQuery()) {
 
                // Iterate through the result set and populate the list
@@ -172,7 +175,8 @@ public class Server extends UnicastRemoteObject implements Interface{
 
         List<String[]> requests = new ArrayList<>(); // Initialize the list to store multiple results
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the IC parameter for the query
             stmt.setString(1, IC);
 
@@ -208,7 +212,8 @@ public class Server extends UnicastRemoteObject implements Interface{
 
         List<String[]> leaveRequests = new ArrayList<>();
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             stmt.setString(1, ID);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -231,7 +236,8 @@ public class Server extends UnicastRemoteObject implements Interface{
     @Override
     public boolean updateLeaveStatus(String leaveRequestId, String newStatus, String empID, String AMT) throws RemoteException {
         String query = "UPDATE tbl_LeaveRequests SET LeaveRequest_Status = ? WHERE LeaveRequest_ID = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the parameters for the query
             stmt.setString(1, newStatus);                  // New leave status
             stmt.setString(2, leaveRequestId); // Convert leaveRequestId to int
@@ -258,7 +264,8 @@ public class Server extends UnicastRemoteObject implements Interface{
                        "SET Emp_LeaveBalance = Emp_LeaveBalance - ? " +
                        "WHERE Emp_ID = ?";
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             stmt.setInt(1, Integer.parseInt(AMT)); // Set the amount to subtract
             stmt.setString(2, empID); // Set the employee ID
 
@@ -276,7 +283,8 @@ public class Server extends UnicastRemoteObject implements Interface{
         String query = "SELECT Emp_ID, Emp_FirstName, Emp_LastName, Emp_LeaveBalance FROM tbl_Employees WHERE Emp_IC = ?";
         String[] employeeDetails = null;
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the IC parameter
             stmt.setString(1, ic);
 
@@ -304,7 +312,8 @@ public class Server extends UnicastRemoteObject implements Interface{
         String query = "INSERT INTO tbl_LeaveRequests (Emp_ID, LeaveRequest_CommencementDate, LeaveRequestAmount, LeaveRequest_Status, LeaveRequest_CreationDate) " +
                        "VALUES (?, ?, ?, 'Pending', CURRENT_DATE)";
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the parameters for the query
             stmt.setInt(1, Integer.parseInt(empId)); // Employee ID as integer
             stmt.setString(2, commencementDate);    // Commencement Date as string
@@ -326,7 +335,8 @@ public class Server extends UnicastRemoteObject implements Interface{
                        "FROM tbl_LeaveRequests WHERE Emp_ID = ?";
         List<String[]> leaveRequests = new ArrayList<>();
 
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        try (Connection conn = DBconnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query);) {
             // Set the Employee ID parameter
             stmt.setInt(1, Integer.parseInt(empId));
 

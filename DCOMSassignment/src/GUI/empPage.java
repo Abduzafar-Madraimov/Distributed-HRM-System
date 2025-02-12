@@ -9,6 +9,7 @@ public class empPage extends javax.swing.JFrame {
     private String IC;
     private String LeaveBalance;
     private String ID;
+    private String[] employeeData;
     public empPage(Interface Server, String IC) {
         this.server = Server;
         this.IC = IC;
@@ -158,7 +159,7 @@ public class empPage extends javax.swing.JFrame {
     private void loadEmployeeData() {
     try {
         // Call server to fetch employee data by IC
-        String[] employeeData = server.getEmployeeDetailsByIC(IC);
+        employeeData = server.getEmployeeDetailsByIC(IC);
 
         if (employeeData != null) {
             // Map first name and last name to the label
@@ -182,7 +183,7 @@ public class empPage extends javax.swing.JFrame {
     }//GEN-LAST:event_empApplyLeaveBtnActionPerformed
 
     private void empUpdateBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_empUpdateBtnActionPerformed
-        empUpdate up = new empUpdate(server, this, ID);
+        empUpdate up = new empUpdate(server, this, ID, employeeData[1], employeeData[2], IC, LeaveBalance);
         up.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_empUpdateBtnActionPerformed
