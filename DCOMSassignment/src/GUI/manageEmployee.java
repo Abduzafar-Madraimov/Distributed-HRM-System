@@ -358,32 +358,54 @@ public class manageEmployee extends javax.swing.JFrame {
     private void manageEmpDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpDeleteActionPerformed
         ID = empIDField.getText();
         IC = empICField.getText();
+
         // CHECK IF EMPLOYEE IS SELECTED
         if (ID.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Please Select an Employee.");
             return;
         }
-        
-        try{
-            boolean result = server.deleteEmployee(ID);
-            if(result){
-                if(EmployeeLoginManager.deleteEmployee(IC)){
-                    JOptionPane.showMessageDialog(null, "Employee Deleted.");
-                    clearFields();
-                    loadEmployeeData();
-                    return;
+
+        // Create two threads, One for DB deletion, one for serialized file deletion
+        Thread dbDeleteThread = new Thread(() -> {
+            try {
+                System.out.println("Started Deleting Employee from Database....");
+                boolean dbResult = server.deleteEmployee(ID);
+                if (dbResult) {
+                    System.out.println("Employee successfully deleted from Database.");
+                } else {
+                    System.out.println("Failed to delete employee from Database.");
                 }
-                JOptionPane.showMessageDialog(null, "Employee Deleted from DB. Not Deleted From File");
-                clearFields();
-                loadEmployeeData();
+            } catch (RemoteException e) {
+                System.out.println("Error deleting from Database: " + e.getMessage());
             }
-            else{
-                JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Deleted.");
+        });
+
+        Thread fileDeleteThread = new Thread(() -> {
+            System.out.println("Started Deleting Employee from Serialized File....");
+            boolean fileResult = EmployeeLoginManager.deleteEmployee(IC);
+            if (fileResult) {
+                System.out.println("Employee successfully deleted from Serialized File.");
+            } else {
+                System.out.println("Failed to delete employee from Serialized File.");
             }
-        }
-        catch(RemoteException e){
+        });
+
+        // Start both threads
+        dbDeleteThread.start();
+        fileDeleteThread.start();
+
+        // Wait for both threads to finish before updating UI
+        try {
+            dbDeleteThread.join();
+            fileDeleteThread.join();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // After deletion, update UI
+        JOptionPane.showMessageDialog(null, "Deletion Process Completed.");
+        clearFields();
+        loadEmployeeData();
     }//GEN-LAST:event_manageEmpDeleteActionPerformed
 
     private void manageEmpClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpClearActionPerformed
