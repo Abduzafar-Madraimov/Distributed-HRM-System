@@ -6,6 +6,7 @@ import dcoms.Serialization.EmployeeLogin;
 import dcoms.Serialization.EmployeeLoginManager;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.JOptionPane;
 
 public class manageEmployee extends javax.swing.JFrame {
@@ -328,31 +329,87 @@ public class manageEmployee extends javax.swing.JFrame {
             return;
         }
         
-        try{
-            Boolean result = server.addNewEmployee(firstname, lastname, IC);
-            if(result == null){
-                JOptionPane.showMessageDialog(null, "IC Already Exists, Change IC and Try Again");
-            }
-            else if(result == false){
-                JOptionPane.showMessageDialog(null, "Server Failed or IC Exists, Employee Not Added.");
-            }
-            else{
+           // AtomicBoolean for thread-safe flag updates
+            AtomicBoolean icExistsFlag = new AtomicBoolean(false);
+            AtomicBoolean dbInsertSuccess = new AtomicBoolean(false);
+            AtomicBoolean fileInsertSuccess = new AtomicBoolean(false);
+
+            // Locking object
+            final Object lock = new Object();
+
+            // Thread 1: Database Insertion
+            Thread dbInsertThread = new Thread(() -> {
+                try {
+                    System.out.println("Started Inserting into database...");
+                    System.out.println("Checking if IC exists in database...");
+                    Boolean dbResult = server.addNewEmployee(firstname, lastname, IC);
+
+                    synchronized (lock) {
+                        if (dbResult == null || !dbResult) {
+                            System.out.println("IC already exists or server error.");
+                            icExistsFlag.set(true); // Mark that IC exists
+                        } else {
+                            dbInsertSuccess.set(true); // Mark database insertion as successful
+                            System.out.println("Database Success...");
+                        }
+                        lock.notify(); // Notify the serialization thread
+                    }
+                } catch (RemoteException e) {
+                    System.out.println("Database insertion failed: " + e.getMessage());
+                }
+            });
+
+            // Thread 2: Serialization
+            Thread fileSerializeThread = new Thread(() -> {
+                try {
+                    System.out.println("Started Inserting in Serialized File...");
+                    synchronized (lock) {
+                        lock.wait(); // Wait until database check is done
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                if (icExistsFlag.get()) {
+                    System.out.println("Skipping serialization as IC already exists.");
+                    return; // Stop execution if IC exists
+                }
+
+                System.out.println("Serializing employee credentials...");
                 EmployeeLogin data = new EmployeeLogin();
                 data.setIC(IC);
                 data.setPassword(Password);
-                if(!EmployeeLoginSerializer.saveLogin(data)){
-                    JOptionPane.showMessageDialog(null, "Employee Added Successfully To Database. Failed To Add to Serialized File.");
-                    clearFields();
-                    loadEmployeeData();
+
+                if (EmployeeLoginSerializer.saveLogin(data)) {
+                    fileInsertSuccess.set(true); // Mark serialization as successful
+                    System.out.println("Serializing Success...");
+                } else {
+                    System.out.println("Serialization failed!");
                 }
-                JOptionPane.showMessageDialog(null, "Employee Added Successfully.");
+            });
+
+            // Start threads
+            dbInsertThread.start();
+            fileSerializeThread.start();
+
+            // Wait for both threads to finish
+            try {
+                dbInsertThread.join();
+                fileSerializeThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Ensure both database and file insertion succeeded before showing success message
+            if (dbInsertSuccess.get() && fileInsertSuccess.get()) {
                 clearFields();
                 loadEmployeeData();
+                JOptionPane.showMessageDialog(null, "Employee added successfully!");
+            } else if (dbInsertSuccess.get()) {
+                JOptionPane.showMessageDialog(null, "Employee added to database but failed to serialize.", "Warning", JOptionPane.WARNING_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Failed to add employee. IC might exist or server error.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-        }
-        catch(RemoteException e){
-            e.printStackTrace();
-        }
     }//GEN-LAST:event_manageEmpAddActionPerformed
 
     private void manageEmpDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpDeleteActionPerformed
@@ -435,7 +492,7 @@ public class manageEmployee extends javax.swing.JFrame {
             try {
                 LeaveBalance = Integer.parseInt(LeaveBalanceText);
 
-                // If the Password field is empty, update details **without** changing password
+                // If the Password field is empty, update details without changing password
                 if (Password.isEmpty()) {
                     if (IC.equals(TempIC)) {  
                         // IC hasn't changed, no need to update in serialized file
@@ -486,7 +543,7 @@ public class manageEmployee extends javax.swing.JFrame {
                             JOptionPane.showMessageDialog(null, "Failed to update Password in Serialized File.");
                         }
                     } else {
-                        // Update both **IC** and **Password** in the serialized file
+                        // Update both IC and Password in the serialized file
                         if (EmployeeLoginManager.updateICAndPassword(TempIC, IC, Password)) {
                             Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
                             if (result == null) {
