@@ -470,7 +470,7 @@ public class manageEmployee extends javax.swing.JFrame {
     }//GEN-LAST:event_manageEmpClearActionPerformed
 
     private void manageEmpEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpEditActionPerformed
-            ID = empIDField.getText();
+           ID = empIDField.getText();
             firstname = empFirstNameField.getText();
             lastname = empLastNameField.getText();
             IC = empICField.getText();
@@ -494,77 +494,58 @@ public class manageEmployee extends javax.swing.JFrame {
 
                 // If the Password field is empty, update details without changing password
                 if (Password.isEmpty()) {
-                    if (IC.equals(TempIC)) {  
-                        // IC hasn't changed, no need to update in serialized file
-                        Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
-                        if (result == null) {
-                            JOptionPane.showMessageDialog(null, "IC Already Exists.");
-                        } else if (!result) {
-                            JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Employee Info Updated Successfully.");
-                            clearFields();
-                            loadEmployeeData();
-                        }
+                    Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
+
+                    if (result == null) {
+                        JOptionPane.showMessageDialog(null, "IC Already Exists.");
+                    } else if (!result) {
+                        JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
                     } else {
-                        // IC has changed, update it in the **serialized file**
-                        if (EmployeeLoginManager.updateIC(TempIC, IC)) {
-                            Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
-                            if (result == null) {
-                                JOptionPane.showMessageDialog(null, "IC Already Exists.");
-                            } else if (!result) {
-                                JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
-                            } else {
+                        if (!IC.equals(TempIC)) {  // IC has changed, update it in the serialized file only if DB update was successful
+                            if (EmployeeLoginManager.updateIC(TempIC, IC)) {
                                 JOptionPane.showMessageDialog(null, "IC and Details Updated Successfully in Serialized File & DB.");
-                                clearFields();
-                                loadEmployeeData();
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Employee Info Updated in DB, but Failed to update IC in Serialized File.");
                             }
                         } else {
-                            JOptionPane.showMessageDialog(null, "Failed to update IC in Serialized File.");
+                            JOptionPane.showMessageDialog(null, "Employee Info Updated Successfully.");
                         }
+                        clearFields();
+                        loadEmployeeData();
                     }
                 } 
                 // If the Password field is filled, update both IC and Password
                 else {
-                    if (IC.equals(TempIC)) {  
-                        // IC hasn't changed, only update Password in the serialized file
-                        if (EmployeeLoginManager.updatePassword(IC, Password)) {
-                            Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
-                            if (result == null) {
-                                JOptionPane.showMessageDialog(null, "IC Already Exists.");
-                            } else if (!result) {
-                                JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
-                            } else {
-                                JOptionPane.showMessageDialog(null, "Password Updated Successfully in Serialized File.");
-                                clearFields();
-                                loadEmployeeData();
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Failed to update Password in Serialized File.");
-                        }
+                    Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
+
+                    if (result == null) {
+                        JOptionPane.showMessageDialog(null, "IC Already Exists.");
+                    } else if (!result) {
+                        JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
                     } else {
-                        // Update both IC and Password in the serialized file
-                        if (EmployeeLoginManager.updateICAndPassword(TempIC, IC, Password)) {
-                            Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
-                            if (result == null) {
-                                JOptionPane.showMessageDialog(null, "IC Already Exists.");
-                            } else if (!result) {
-                                JOptionPane.showMessageDialog(null, "Server Failed, Employee Not Edited.");
+                        if (IC.equals(TempIC)) {  
+                            if (EmployeeLoginManager.updatePassword(IC, Password)) {
+                                JOptionPane.showMessageDialog(null, "Password Updated Successfully in Serialized File.");
                             } else {
-                                JOptionPane.showMessageDialog(null, "IC, Password, & Details Updated Successfully in Serialized File & DB.");
-                                clearFields();
-                                loadEmployeeData();
+                                JOptionPane.showMessageDialog(null, "Employee Info Updated in DB, but Failed to update Password in Serialized File.");
                             }
                         } else {
-                            JOptionPane.showMessageDialog(null, "Failed to update IC & Password in Serialized File.");
+                            if (EmployeeLoginManager.updateICAndPassword(TempIC, IC, Password)) {
+                                JOptionPane.showMessageDialog(null, "IC, Password, & Details Updated Successfully in Serialized File & DB.");
+                            } else {
+                                JOptionPane.showMessageDialog(null, "Employee Info Updated in DB, but Failed to update IC & Password in Serialized File.");
+                            }
                         }
+                        clearFields();
+                        loadEmployeeData();
                     }
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid Leave Balance. Please enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid Leave Ba lance. Please enter a number.", "Error", JOptionPane.ERROR_MESSAGE);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+
     }//GEN-LAST:event_manageEmpEditActionPerformed
 
     private void employeeTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_employeeTableMouseClicked
