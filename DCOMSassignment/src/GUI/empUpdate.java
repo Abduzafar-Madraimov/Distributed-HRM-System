@@ -176,7 +176,7 @@ public class empUpdate extends javax.swing.JFrame {
 
             if (newIC.equals(IC)) { 
                 // IC has NOT been changed, just update other details in the database
-                boolean result = server.editEmployee(ID, FirstName.getText(), LastName.getText(), IC, Integer.parseInt(LeaveBalance));
+                Boolean result = server.editEmployee(ID, FirstName.getText(), LastName.getText(), IC, newIC, Integer.parseInt(LeaveBalance));
 
                 if (result) {
                     JOptionPane.showMessageDialog(this, "Employee details updated successfully.");
@@ -185,7 +185,7 @@ public class empUpdate extends javax.swing.JFrame {
                 }
             } else {
                 // IC has CHANGED, update in both database and serialized file
-                boolean dbUpdate = server.editEmployee(ID, FirstName.getText(), LastName.getText(), newIC, Integer.parseInt(LeaveBalance));
+                Boolean dbUpdate  = server.editEmployee(ID, FirstName.getText(), LastName.getText(), IC, newIC, Integer.parseInt(LeaveBalance));       
                 boolean icUpdate = EmployeeLoginManager.updateIC(IC, newIC); // Update in serialized file
 
                 if (dbUpdate && icUpdate) {

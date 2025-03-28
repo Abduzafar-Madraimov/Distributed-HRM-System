@@ -8,7 +8,7 @@ public interface Interface extends Remote{ // we extend remote to use this metho
     public List<String[]> getAllEmployees() throws RemoteException; // RETURN LIST OF EMPLOYEES
     public boolean checkIfICExists(String IC)throws RemoteException; // CHECK IF THE IC EXISTS
     public Boolean addNewEmployee(String firstName, String lastName, String IC) throws RemoteException; // ADD NEW EMPLOYEE
-    public Boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException; // EDIT AN EMPLOYEE
+    public Boolean editEmployee(String id, String firstName, String lastName, String originalIC, String newIC, int leaveBalance) throws RemoteException;
     public boolean deleteEmployee(String id) throws RemoteException; // EDIT AN EMPLOYEE
     public List<String[]> getAllLeaveRequests() throws RemoteException; // GET LEAVE REQUESTS OF EMPLOYEES
     public List<String[]> getLeaveRequestsByIC(String IC) throws RemoteException; // GET LEAVE REQUESTS OF SPECIFIC EMPLOYEE

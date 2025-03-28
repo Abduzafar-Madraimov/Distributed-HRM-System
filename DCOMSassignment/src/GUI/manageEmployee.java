@@ -470,7 +470,7 @@ public class manageEmployee extends javax.swing.JFrame {
     }//GEN-LAST:event_manageEmpClearActionPerformed
 
     private void manageEmpEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manageEmpEditActionPerformed
-           ID = empIDField.getText();
+            ID = empIDField.getText();
             firstname = empFirstNameField.getText();
             lastname = empLastNameField.getText();
             IC = empICField.getText();
@@ -494,7 +494,7 @@ public class manageEmployee extends javax.swing.JFrame {
 
                 // If the Password field is empty, update details without changing password
                 if (Password.isEmpty()) {
-                    Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
+                    Boolean result = server.editEmployee(ID, firstname, lastname, TempIC, IC, LeaveBalance);
 
                     if (result == null) {
                         JOptionPane.showMessageDialog(null, "IC Already Exists.");
@@ -516,7 +516,7 @@ public class manageEmployee extends javax.swing.JFrame {
                 } 
                 // If the Password field is filled, update both IC and Password
                 else {
-                    Boolean result = server.editEmployee(ID, firstname, lastname, IC, LeaveBalance);
+                    Boolean result = server.editEmployee(ID, firstname, lastname, TempIC, IC, LeaveBalance);
 
                     if (result == null) {
                         JOptionPane.showMessageDialog(null, "IC Already Exists.");
@@ -545,7 +545,6 @@ public class manageEmployee extends javax.swing.JFrame {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-
     }//GEN-LAST:event_manageEmpEditActionPerformed
 
     private void employeeTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_employeeTableMouseClicked

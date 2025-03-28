@@ -88,11 +88,11 @@ public class Server extends UnicastRemoteObject implements Interface{
     
     // EDIT EMPLOYEE DATA
     @Override
-    public Boolean editEmployee(String id, String firstName, String lastName, String ic, int leaveBalance) throws RemoteException {
-        // Check if the new IC already exists (except for the current employee)
-        if (checkIfICExists(ic)) {
+    public Boolean editEmployee(String id, String firstName, String lastName, String originalIC, String newIC, int leaveBalance) throws RemoteException {
+        // Only check if IC exists if the user is trying to change it
+        if (!originalIC.equals(newIC) && checkIfICExists(newIC)) {
             System.out.println("IC already exists in the database for another employee.");
-            return null; // Indicate IC conflict
+            return null; // IC conflict
         }
 
         String query = "UPDATE TBL_EMPLOYEES SET Emp_FirstName = ?, Emp_LastName = ?, Emp_IC = ?, Emp_LeaveBalance = ? WHERE Emp_ID = ?";
@@ -103,7 +103,7 @@ public class Server extends UnicastRemoteObject implements Interface{
             // Set the parameters for the UPDATE query
             stmt.setString(1, firstName);
             stmt.setString(2, lastName);
-            stmt.setString(3, ic);
+            stmt.setString(3, newIC);
             stmt.setInt(4, leaveBalance);
             stmt.setString(5, id);
 
