@@ -2,6 +2,21 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Serialization/EmployeeLogin.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Serialization/EmployeeLoginManager.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/GUI/manageEmpLeave.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Serialization/EmployeeLoginDeserializer.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/DBconnection.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Server.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/GUI/generateLeave.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Interface.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/GUI/manageEmployee.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Serialization/AppendableObjectOutputStream.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/GUI/empLogin.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Client.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Register.java</file>
+            <file>file:/C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/DCOMSassignment/src/dcoms/Serialization/EmployeeLoginSerializer.java</file>
+        </group>
     </open-files>
 </project-private>

@@ -16,7 +16,7 @@ public class Client {
         Interface server = (Interface)Naming.lookup("rmi://localhost:1444/HRserver");
         
         
-        List<EmployeeLogin> logins = EmployeeLoginDeserializer.loadLogins("C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/employees_data.ser");
+        List<EmployeeLogin> logins = EmployeeLoginDeserializer.loadLogins("C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/employees_data.ser");
         for (EmployeeLogin login : logins) {
             System.out.println("Employee IC: " + login.getEmployeeIC());
             System.out.println("Password: " + login.getPassword());

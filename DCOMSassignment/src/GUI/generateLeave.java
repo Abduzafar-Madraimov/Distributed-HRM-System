@@ -159,7 +159,7 @@ public class generateLeave extends javax.swing.JFrame {
             }
 
             // Define the PDF file path
-            String pdfFilePath = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/LeaveRequests.pdf";
+            String pdfFilePath = "C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/LeaveRequests.pdf";
 
             // Create a PDF writer
             PdfWriter writer = new PdfWriter(pdfFilePath);
@@ -216,7 +216,7 @@ public class generateLeave extends javax.swing.JFrame {
             }
 
             // Define the PDF file path
-            String pdfFilePath = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/LeaveRequests.pdf";
+            String pdfFilePath = "C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/LeaveRequests.pdf";
 
             // Create a PDF writer
             PdfWriter writer = new PdfWriter(pdfFilePath);

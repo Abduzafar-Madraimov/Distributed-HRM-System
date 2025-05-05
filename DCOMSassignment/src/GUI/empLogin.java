@@ -132,7 +132,7 @@ public class empLogin extends javax.swing.JFrame {
         }
 
         // Load stored logins
-        String Path = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/employees_data.ser";
+        String Path = "C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/employees_data.ser";
         List<EmployeeLogin> logins = EmployeeLoginDeserializer.loadLogins(Path);
 
         // Authenticate

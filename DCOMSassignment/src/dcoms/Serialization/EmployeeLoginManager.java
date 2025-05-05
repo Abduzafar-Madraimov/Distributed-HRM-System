@@ -3,7 +3,7 @@ package dcoms.Serialization;
 import java.util.List;
 
 public class EmployeeLoginManager {
-    private static final String filePath = "C:/Users/amazi/Desktop/Year 3/Distibuted Systems/Assignment/employees_data.ser";
+    private static final String filePath = "C:/Users/abduz/NetBeansProjects/DCOMSAssignment/DCOMS/employees_data.ser";
 
     // Update Employee Password
     public static boolean updatePassword(String employeeIC, String newPassword) {
